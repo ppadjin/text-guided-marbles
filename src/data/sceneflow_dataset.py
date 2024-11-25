@@ -51,13 +51,14 @@ class SceneFlowDataset(InputDataset):
         self.depth_remove_outliers = depth_remove_outliers
         self.outlier_std_ratio = outlier_std_ratio
 
-    def get_data(self, image_idx: int) -> Dict:
+    def get_image(self, image_idx: int) -> Dict:
         """Returns the ImageDataset data as a dictionary.
 
         Args:
             image_idx: The image index in the dataset.
         """
-        image = self.get_image(image_idx)[:, :, :3]  # ignore alpha channel
+        image = self.get_data(image_idx)  # ignore alpha channel
+        image = image['image'][:, :, :3]
         data = {"image_idx": image_idx, "image": image}
         if self.mask_filenames is not None:
             mask_filepath = self.mask_filenames[image_idx]
@@ -219,7 +220,7 @@ class SceneFlowDataset(InputDataset):
         xs = xs[mask]
         ys = ys[mask]
         segmentation = segmentation[mask]
-        image = image[mask]
+        image = image['image'][mask]
         xs_orig, ys_orig = xs.clone(), ys.clone()
         xys_orig = torch.stack((xs_orig, ys_orig), dim=-1)
 

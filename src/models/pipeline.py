@@ -229,7 +229,7 @@ class GaussianSplattingPipeline(VanillaPipeline):
         metrics_dict_list, metrics_dict_list_composited = [], []
         assert isinstance(self.datamanager, GaussianSplattingDataManager)
         if split == 'val':
-            dataloader = self.datamanager.fixed_indices_eval_dataloader
+            dataloader = self.datamanager._fixed_indices_eval_dataloader
         else:
             dataloader = self.datamanager.fixed_indices_train_dataloader
 
@@ -329,7 +329,7 @@ class GaussianSplattingPipeline(VanillaPipeline):
 
         # select dataloader
         if split == 'val':
-            dataloader = self.datamanager.fixed_indices_eval_dataloader
+            dataloader = self.datamanager._fixed_indices_eval_dataloader
         else:
             dataloader = self.datamanager.fixed_indices_train_dataloader
 

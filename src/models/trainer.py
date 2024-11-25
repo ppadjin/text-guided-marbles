@@ -37,8 +37,8 @@ from nerfstudio.utils.decorators import check_eval_enabled, check_main_thread, c
 from nerfstudio.utils.misc import step_check
 from nerfstudio.utils.rich_utils import CONSOLE
 from nerfstudio.utils.writer import EventName, TimeWriter
-from nerfstudio.viewer.server.viewer_state import ViewerState
-from nerfstudio.viewer_beta.viewer import Viewer as ViewerBetaState
+from nerfstudio.viewer_legacy.server.viewer_state import ViewerLegacyState
+from nerfstudio.viewer.viewer import Viewer as ViewerBetaState
 from rich import box, style
 from rich.panel import Panel
 from rich.table import Table
@@ -160,7 +160,7 @@ class Trainer:
             datapath = self.config.data
             if datapath is None:
                 datapath = self.base_dir
-            self.viewer_state = ViewerState(
+            self.viewer_state = ViewerLegacyState(
                 self.config.viewer,
                 log_filename=viewer_log_path,
                 datapath=datapath,
@@ -169,7 +169,7 @@ class Trainer:
                 train_lock=self.train_lock,
             )
             banner_messages = [f"Viewer at: {self.viewer_state.viewer_url}"]
-        if self.config.is_viewer_beta_enabled() and self.local_rank == 0:
+        '''if self.config.is_viewer_beta_enabled() and self.local_rank == 0:
             datapath = self.config.data
             if datapath is None:
                 datapath = self.base_dir
@@ -182,13 +182,14 @@ class Trainer:
                 train_lock=self.train_lock,
                 share=self.config.viewer.make_share_url,
             )
-            banner_messages = [f"Viewer Beta at: {self.viewer_state.viewer_url}"]
+            banner_messages = [f"Viewer Beta at: {self.viewer_state.viewer_url}"]'''
         self._check_viewer_warnings()
 
         self._load_checkpoint()
 
         self.callbacks = self.pipeline.get_training_callbacks(
             TrainingCallbackAttributes(
+                trainer=self,
                 optimizers=self.optimizers,
                 grad_scaler=self.grad_scaler,
                 pipeline=self.pipeline,

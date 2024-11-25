@@ -11,6 +11,7 @@ import torch
 from torch import nn
 from nerfstudio.cameras.cameras import Cameras
 from src.data.databundle import GaussianSplattingImageBundle
+from src.data.sceneflow_dataset import SceneFlowDataset
 from src.utils.utils import focal2fov, getWorld2View2, getProjectionMatrix
 
 
@@ -145,7 +146,7 @@ class GaussianSplattingFixedIndicesEvalDataloader(EvalDataloader):
     """Dataloader that iterates through all images"""
     def __init__(
         self,
-        input_dataset: InputDataset,
+        input_dataset: SceneFlowDataset,
         image_indices: Optional[Tuple[int]] = None,
         device: Union[torch.device, str] = "cpu",
         **kwargs,

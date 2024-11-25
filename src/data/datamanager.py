@@ -24,6 +24,7 @@ from nerfstudio.data.utils.dataloaders import (
 )
 from nerfstudio.utils.rich_utils import CONSOLE
 from nerfstudio.data.datamanagers.base_datamanager import DataManagerConfig, DataManager, variable_res_collate
+from nerfstudio.data.datamanagers.full_images_datamanager import FullImageDatamanagerConfig,FullImageDatamanager
 from src.data.dataloader import \
     GaussianSplattingImageSampler, GaussianSplattingFixedIndicesEvalDataloader
 from nerfstudio.cameras.camera_optimizers import CameraOptimizerConfig
@@ -33,7 +34,7 @@ from src.data.sceneflow_dataset import SceneFlowDataset
 
 
 @dataclass
-class GaussianSplattingDataManagerConfig(DataManagerConfig):
+class GaussianSplattingDataManagerConfig(FullImageDatamanagerConfig):
     """A basic data manager"""
 
     _target: Type = field(default_factory=lambda: GaussianSplattingDataManager)
@@ -57,7 +58,7 @@ class GaussianSplattingDataManagerConfig(DataManagerConfig):
     zfar: float = 100.0
 
 
-class GaussianSplattingDataManager(DataManager):
+class GaussianSplattingDataManager(FullImageDatamanager):
     """Gaussian splatting stored data manager implementation.
     """
 
@@ -98,6 +99,8 @@ class GaussianSplattingDataManager(DataManager):
         self.includes_time = self.dataparser.includes_time
         self.train_dataparser_outputs: DataparserOutputs = self.dataparser.get_dataparser_outputs(split="train")
 
+        super().__init__(config, device, test_mode, world_size, local_rank, **kwargs)
+
         # build train and eval datasets
         self.train_dataset = self.load_dataset(self.train_dataparser_outputs, self.config.camera_res_scale_factor)
         self.eval_dataset = self.load_dataset(self.dataparser.get_dataparser_outputs(split=self.test_split), self.config.camera_res_scale_factor)
@@ -120,7 +123,7 @@ class GaussianSplattingDataManager(DataManager):
                         CONSOLE.print("Variable resolution, using variable_res_collate")
                         self.config.collate_fn = variable_res_collate
                         break
-        super().__init__()
+        
 
     def load_dataset(self, dataparser_outputs, camera_res_scale_factor):
         return SceneFlowDataset(
@@ -168,7 +171,7 @@ class GaussianSplattingDataManager(DataManager):
         self.eval_image_sampler = GaussianSplattingImageSampler(self.eval_dataset.cameras, znear=self.config.znear, zfar=self.config.zfar)
 
         # for inference-time --> called directly in Pipeline class
-        self.fixed_indices_eval_dataloader = GaussianSplattingFixedIndicesEvalDataloader(
+        self._fixed_indices_eval_dataloader = GaussianSplattingFixedIndicesEvalDataloader(
             input_dataset=self.eval_dataset,
             device='cpu',
             num_workers=self.world_size * 4,
