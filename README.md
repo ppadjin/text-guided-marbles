@@ -1,6 +1,8 @@
-# Dynamic Gaussian Marbles for Novel View Synthesis of Casual Monocular Videos
+# Text-Guided Dynamic Gaussian Splatting Editing via Diffusion
 
-This is the official implementation for the SIGGRAPH Asia 2024 paper **Dynamic Gaussian Marbles for Novel View Synthesis of Casual Monocular Videos**. [[Paper](https://arxiv.org/pdf/2406.18717)] [[Project Page](https://geometry.stanford.edu/projects/dynamic-gaussian-marbles.github.io/)]
+This is the fork of the **Dynamic Gaussian Marbles for Novel View Synthesis of Casual Monocular Videos** official repo. [[Paper](https://arxiv.org/pdf/2406.18717)] [[Project Page](https://geometry.stanford.edu/projects/dynamic-gaussian-marbles.github.io/)]
+
+This project enables entering a text prompt that changes the Dynamic scene recorded from a monocular camera.
 
 Training View Tracking   |  Novel View Synthesis
 -------------------------|-------------------------
