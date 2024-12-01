@@ -2,15 +2,13 @@
 
 This is the fork of the **Dynamic Gaussian Marbles for Novel View Synthesis of Casual Monocular Videos** official repo. [[Paper](https://arxiv.org/pdf/2406.18717)] [[Project Page](https://geometry.stanford.edu/projects/dynamic-gaussian-marbles.github.io/)]
 
-This project enables entering a text prompt that changes the Dynamic scene recorded from a monocular camera.
+This project enables entering a text prompt that changes the Dynamic scene recorded from a monocular camera. It implements the iterative method for dataset change using the ideas from the Instruct-GS2GS paper (https://instruct-gs2gs.github.io/). 
 
 Training View Tracking   |  Novel View Synthesis
 -------------------------|-------------------------
 ![](media/spiral_render_original.gif) | ![](media/spiral_render_edited.gif)
 
-## Changelog
-- Oct. 21st, 2024: v0.2: Better models updated data loading. **Old checkpoints and datasets from v0.1 will not work with this version!** 
-- Sep. 10th, 2024: v0.1: initial release of code.
+
 
 ## Installation
 
