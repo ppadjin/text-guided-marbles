@@ -6,7 +6,7 @@ This project enables entering a text prompt that changes the Dynamic scene recor
 
 Training View Tracking   |  Novel View Synthesis
 -------------------------|-------------------------
-![](media/cayote-tracking.gif) | ![](media/cayote-teaser.gif)
+![](media/spiral_render_original.mp4) | ![](media/spiral_render_edited.mp4)
 
 ## Changelog
 - Oct. 21st, 2024: v0.2: Better models updated data loading. **Old checkpoints and datasets from v0.1 will not work with this version!** 
