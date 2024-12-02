@@ -182,7 +182,7 @@ class GaussianSplattingPipeline(VanillaPipeline):
             # get model outputs, loss, and metrics
             model_outputs = self._model(ray_bundle)  # train distributed data parallel model if world_size > 1
             metrics_dict = self.model.get_metrics_dict(model_outputs, batch)
-            loss_dict = self.model.get_loss_dict(model_outputs, batch, metrics_dict, self.datamanager.iter_train_image_dataloader, self.datamanager.train_image_sampler)
+            loss_dict = self.model.get_loss_dict(model_outputs, batch, metrics_dict, self.datamanager.iter_train_image_dataloader, self.datamanager.train_image_sampler, ray_bundle)
             return model_outputs, loss_dict, metrics_dict
 
         else:         
@@ -217,6 +217,8 @@ class GaussianSplattingPipeline(VanillaPipeline):
             if (edited_image.size() != rendered_image.size()):
                 edited_image = torch.nn.functional.interpolate(edited_image, size=rendered_image.size()[2:], mode='bilinear')
 
+            #from PIL import Image
+            #Image.fromarray((edited_image.squeeze().permute(1,2,0).cpu().numpy() * 255).astype(np.uint8)).save(f"render_debug/{idx}-{step}.png")
             # write edited image to dataloader
             edited_image = edited_image.to(original_image.dtype)
             self.datamanager.train_image_dataloader.cached_collated_batch["image"][idx] = edited_image.squeeze().permute(1,2,0)

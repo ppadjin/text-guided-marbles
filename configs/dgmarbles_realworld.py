@@ -38,6 +38,7 @@ train_config = \
                 isometry_knn=24,
                 isometry_knn_radius=0.3,
                 isometry_loss_weight=0.4,
+                consistency_loss_weight=0.01,
                 isometry_weight_background_factor=1.0,
                 lpips_loss_weight=0.002,
                 number_of_gaussians=300000,
@@ -77,7 +78,7 @@ train_config = \
                 {'type': 'global-adjust', 'steps': 64},
             ],
             text_guided=True,
-            prompt="change the person to a clown",
+            prompt="change the person to a clown and don't change his height. don't change anything else in the scene.",
             gs_steps=2500
 
         ),
