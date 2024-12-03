@@ -189,14 +189,10 @@ class GaussianSplattingPipeline(VanillaPipeline):
             # get index
             idx = self.curr_edit_idx
             cameras = self.datamanager.train_dataset.cameras.to(self.model.device)
-            camera, data, image_idx = self.datamanager.next_train_idx(idx)
+            _, data, image_idx = self.datamanager.next_train_idx(idx)
             camera_ray_bundle = cameras.generate_rays(camera_indices=image_idx)
-            #camera_ray_bundle.metadata['nframes'][camera_ray_bundle.metadata['nframes'] == 132] = image_idx
-
-            #camera_ray_bundle['metadata']['nframes'] 
-
+            
             model_outputs = self.model.get_outputs_for_camera_ray_bundle(camera_ray_bundle, image_idx[0].item())
-            #model_outputs = self.model(camera)
             metrics_dict = self.model.get_metrics_dict(model_outputs, data)
 
             original_image = self.datamanager.original_cached_train["image"][idx].unsqueeze(dim=0).permute(0, 3, 1, 2)
