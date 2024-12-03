@@ -4,11 +4,13 @@ This is the fork of the **Dynamic Gaussian Marbles for Novel View Synthesis of C
 
 This project enables entering a text prompt that changes the Dynamic scene recorded from a monocular camera. It implements the iterative method for dataset change using the ideas from the Instruct-GS2GS paper (https://instruct-gs2gs.github.io/). 
 
-Original Gaussian NVS   |  Text-Guided NVS
+Original Gaussian Marbles   |  From-scratch modified
 -------------------------|-------------------------
 ![](media/spiral_render_original.gif) | ![](media/spiral_render_edited.gif)
 
-
+Iterative dataset refining (Instruct GS2GS)   |  Iterative dataset refining with Consistency loss
+-------------------------|-------------------------
+![](media/gs2gs_render.gif) | ![](media/consistency_render.gif)
 
 ## Installation
 
