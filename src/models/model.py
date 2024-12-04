@@ -332,12 +332,12 @@ class GaussianSplattingModel(Model):
         consistency_loss = torch.zeros(1).to(chamfer_loss)
         if self.config.consistency_loss_weight > 0 and ray_bundle is not None:
             random_t = (torch.randn(3) * 0.002).to(chamfer_loss)
-            dx, dy = self.compute_pixel_translation(ray_bundle, random_t)
+            dx, dy = self.translation_3d_to_2d(ray_bundle, random_t)
             translated_ray_bundle = deepcopy(ray_bundle)
             translated_ray_bundle.camera_center += torch.tensor(random_t, dtype=torch.float32).to(translated_ray_bundle.camera_center.device)
-            t_tensor = torch.tensor(random_t, dtype=torch.float32).to(translated_ray_bundle.nstudio_c2w.device).unsqueeze(-1)  # Shape (3, 1)
-            translated_ray_bundle.nstudio_c2w[..., :3, 3] += t_tensor.squeeze(-1)
-            translated_ray_bundle.world_view_transform[..., :3, 3] += t_tensor.squeeze(-1)
+            t_tensor = torch.tensor(random_t, dtype=torch.float32).to(translated_ray_bundle.nstudio_c2w.device)
+            translated_ray_bundle.nstudio_c2w[..., :3, 3] += t_tensor
+            translated_ray_bundle.world_view_transform[..., :3, 3] += t_tensor
 
             translated_bundle_out = self.field(translated_ray_bundle)
             
@@ -523,47 +523,42 @@ class GaussianSplattingModel(Model):
         Returns:
             Translated image tensor of shape (H, W, 3).
         """
-        # Ensure the image has a batch and channel dimension
         if image.dim() == 3:
-            image = image.permute(2, 0, 1).unsqueeze(0)  # Shape: (1, 3, H, W)
+            image = image.permute(2, 0, 1).unsqueeze(0) 
 
-        # Get image dimensions
         _, _, H, W = image.shape
 
-        # Create normalized grid
+        # This grid will define the mapping from original to translated coords in image space
         y, x = torch.meshgrid(
-            torch.linspace(-1, 1, H, device=image.device),
+            torch.linspace(-1, 1, H, device=image.device),  
             torch.linspace(-1, 1, W, device=image.device),
             indexing='ij'
         )
-        grid = torch.stack((x, y), dim=-1)  # Shape: (H, W, 2)
+        grid = torch.stack((x, y), dim=-1)
 
-        # Compute normalized translation
         norm_dx = dx / (W / 2)
         norm_dy = dy / (H / 2)
 
-        # Apply the translation to the grid
         translated_grid = grid.clone()
-        translated_grid[..., 0] -= norm_dx  # x-coordinate
-        translated_grid[..., 1] -= norm_dy  # y-coordinate
+        translated_grid[..., 0] -= norm_dx 
+        translated_grid[..., 1] -= norm_dy 
 
-        # Apply the grid transformation using grid_sample
         translated_image = FT.grid_sample(
             image,
-            translated_grid.unsqueeze(0),  # Add batch dimension
+            translated_grid.unsqueeze(0), 
             mode='bilinear',
             padding_mode='zeros',
             align_corners=True
         )
 
-        # Remove batch and channel dimensions if necessary
         translated_image = translated_image.squeeze(0).permute(1, 2, 0)  # Shape: (H, W, 3)
 
         return translated_image
     
-    def compute_pixel_translation(self, ray_bundle, t):
+    def translation_3d_to_2d(self, ray_bundle, t):
         """
         Compute the 2D pixel translation [dx, dy] caused by a 3D translation t=[x, y, z].
+        All of these steps are basically 
         
         Args:
             ray_bundle: An instance of RayBundle with the required attributes.
@@ -572,13 +567,11 @@ class GaussianSplattingModel(Model):
         Returns:
             dx, dy: The 2D pixel translation caused by the 3D translation.
         """
-        # Extract attributes
         fx, fy = ray_bundle.fx, ray_bundle.fy
         cx, cy = ray_bundle.cx, ray_bundle.cy
-        c2w = ray_bundle.nstudio_c2w  # Camera-to-world matrix (batch x 4 x 4)
-        camera_center = ray_bundle.camera_center  # Camera center in world space (batch x 3)
+        c2w = ray_bundle.nstudio_c2w
+        camera_center = ray_bundle.camera_center
         
-        # Convert translation t to a tensor if not already
         t = torch.tensor(t, dtype=torch.float32).to(camera_center.device)
 
         # Transform the camera center by the translation t
@@ -586,10 +579,9 @@ class GaussianSplattingModel(Model):
 
         # Project original camera center to 2D
         camera_center_h = torch.cat([camera_center, torch.ones_like(camera_center[..., :1])], dim=-1)  # Homogeneous coords
-        camera_center_proj = c2w @ camera_center_h.unsqueeze(-1)  # Shape: (batch x 4 x 1)
-        camera_center_proj = camera_center_proj.squeeze(-1)  # Shape: (batch x 4)
+        camera_center_proj = c2w @ camera_center_h.unsqueeze(-1)  # (B x 4 x 1)
+        camera_center_proj = camera_center_proj.squeeze(-1)  # (B x 4)
 
-        # Apply projection (normalized device coordinates -> pixel coordinates)
         x_ndc = camera_center_proj[..., 0] / camera_center_proj[..., 2]
         y_ndc = camera_center_proj[..., 1] / camera_center_proj[..., 2]
         x_pixel = fx * x_ndc + cx
@@ -598,8 +590,8 @@ class GaussianSplattingModel(Model):
     
         # Project translated camera center to 2D
         translated_center_h = torch.cat([translated_camera_center, torch.ones_like(translated_camera_center[..., :1])], dim=-1)
-        translated_center_proj = c2w @ translated_center_h.unsqueeze(-1)  # Shape: (batch x 4 x 1)
-        translated_center_proj = translated_center_proj.squeeze(-1)  # Shape: (batch x 4)
+        translated_center_proj = c2w @ translated_center_h.unsqueeze(-1)  # (B x 4 x 1)
+        translated_center_proj = translated_center_proj.squeeze(-1)  # (B x 4)
 
         x_ndc_t = translated_center_proj[..., 0] / translated_center_proj[..., 2]
         y_ndc_t = translated_center_proj[..., 1] / translated_center_proj[..., 2]
