@@ -138,7 +138,7 @@ scene_datadir
 
 ### Downloading Checkpoints
 
-We provide the checkpoints for Skating and Playground scenes [here]([https://drive.google.com/drive/folders/1VqGmTZL3uDuHzET0c3_bIJwcKVDTwHac?usp=drive_link](https://drive.google.com/drive/folders/1bGVywAFBUBjMZRqpi8dlHXtIpfR-ZSop?usp=sharing)). 
+We provide the checkpoints for Skating and Playground scenes [here](https://drive.google.com/drive/folders/1VqGmTZL3uDuHzET0c3_bIJwcKVDTwHac?usp=drive_link). 
 Please download the appropriate checkpoints, and place them into a `checkpoints` directory.
 Please make sure that each checkpoint is within its OWN subdirectory (as our loader takes in an entire directory and searches for the latest
 checkpoint within that directory).
