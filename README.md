@@ -4,7 +4,7 @@ This is the fork of the **Dynamic Gaussian Marbles for Novel View Synthesis of C
 
 This project enables entering a text prompt that changes the Dynamic scene recorded from a monocular camera. It implements the iterative method for dataset change using the ideas from the Instruct-GS2GS paper (https://instruct-gs2gs.github.io/). 
 
-It also uses [consistency loss(https://arxiv.org/abs/1902.10424)] to enhance the temporal consistency of generations. 
+It also uses [consistency loss](https://arxiv.org/abs/1902.10424) to enhance the temporal consistency of generations. 
 
 Original Gaussian Marbles   |  From-scratch modified
 -------------------------|-------------------------
